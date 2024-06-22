@@ -1,4 +1,4 @@
-const { Notification, dialog } = require('electron');
+const { Notification, dialog, shell } = require('electron');
 const fs = require('fs');
 // import PDFParser from "pdf2json";
 const PDFParser = require("pdf2json");
@@ -19,7 +19,6 @@ const writeFile = (fileName, data) => {
 // result By College
 const resultByCollege = data => {
   // 1. separate result by college
-  // const collegeResults = data.match(/\d{5}\s?-\s?[\w'\s-]+,\s?Cox's Bazar+[\w\d\n\s,\(\)\{\}\/\.\-\:]+Memo/g)
   const collegeResults = data.match(/\d{5}\s?-\s?[\w'\s-]+,\s?[\w\s]+[.\s\S]+?Note/g)
 
   // 2. Process Result
@@ -27,17 +26,13 @@ const resultByCollege = data => {
   // console.log(collegeResults)
   console.log("collegeResults length:", collegeResults.length)
   collegeResults.forEach(college => {
-    // let collegeNameRegex = /\d{5}\s?-\s?[\w'\s-]+,\s?Cox's Bazar+/g
     let collegeNameRegex = /\d{5}\s+-\s[\w'\s-]+[^,]/g
     const collegeName = college.match(collegeNameRegex)[0]
-    // console.log(collegeName)
     // writeFile('./college/' + collegeName + '.txt', college)
 
     // 2.1 result with gpa
-    // return //temp
     const passResult = {};
     let passMatch = college.match(/\d+\s+\(\s+\d.\d+\s+\)/g)
-    // console.log(passMatch)
     if (passMatch) {
       passMatch.forEach(res => {
         let [roll, rest] = res.split(' (  ')
@@ -70,9 +65,6 @@ const resultByCollege = data => {
 pdfParser.on("pdfParser_dataReady", async (pdfData) => {
   let data = pdfParser.getRawTextContent()
   writeFile("./content.txt", data)
-  // console.log(data)
-
-  // return //temp
 
   const finalResult = await resultByCollege(data)
   // console.log(finalResult)
@@ -81,17 +73,18 @@ pdfParser.on("pdfParser_dataReady", async (pdfData) => {
     filters: [{ name: "json", extensions: ["json"] }],
   })
   if (!canceled) {
-    // console.log(finalResult)
     console.log(filePath)
-    fs.writeFile(filePath, JSON.stringify({
-      data: finalResult,
-      meta: {
-        savedOn: new Date().toLocaleDateString()
-      }
-    }), () => {
-      const doneNotification = new Notification({ title: "Data Extracted.", body: `Result Extraction Done.` })
-      doneNotification.show()
-    });
+    fs.writeFile(filePath,
+      JSON.stringify({
+        data: finalResult,
+        meta: {
+          savedOn: new Date().toLocaleDateString()
+        }
+      }), () => {
+        const doneNotification = new Notification({ title: "Data Extracted.", body: `Result Extraction Done.` })
+        doneNotification.show()
+        shell.showItemInFolder(filePath)
+      });
 
   }
 });

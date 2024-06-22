@@ -1,5 +1,7 @@
 const { app, BrowserWindow, ipcMain, dialog, Notification } = require('electron');
 const path = require('node:path');
+// const fs = require('fs')
+const fs = require('fs').promises;
 const { extract } = require('./util/resultExtractor')
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -11,7 +13,7 @@ const createWindow = () => {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: 800,
-    height: 600,
+    height: 650,
     icon: path.join(__dirname, 'logo.ico'),
     webPreferences: {
       contextIsolation: false,
@@ -41,8 +43,8 @@ app.whenReady().then(() => {
     }
   });
 
-  ipcMain.handle('dialog:open', async (event, data) => {
-    console.log("hit dialog:open")
+  ipcMain.handle('dialog:openPdf', async (event, data) => {
+    console.log("hit dialog:openPdf")
     const { canceled, filePaths } = await dialog.showOpenDialog({
       title: 'Select result PDF',
       filters: [
@@ -51,15 +53,43 @@ app.whenReady().then(() => {
     })
 
     if (!canceled) {
-      let path = filePaths[0]
-      console.log(path)
-      const startNotification = new Notification({ title: "Extraction Started", body: `Extracting Result from ${path}` })
+      let pdfPath = filePaths[0]
+      console.log(pdfPath)
+      const startNotification = new Notification({ title: "Extraction Started", body: `Extracting Result from ${pdfPath}` })
       startNotification.show()
       setTimeout(() => startNotification.close(), 1500)
-      extract(path)
+      extract(pdfPath)
     }
 
   })
+
+
+
+  ipcMain.handle('dialog:importJson', async (event, data) => {
+    let { canceled, filePaths } = await dialog.showOpenDialog({
+      title: "Import JSON File",
+      filters: [{ name: "json", extensions: ["json"] }]
+    });
+
+    let resultObject = {};
+    if (!canceled && filePaths.length === 1) {
+      try {
+        const fileData = await fs.readFile(filePaths[0], 'utf-8');
+        resultObject = JSON.parse(fileData);
+        console.log(resultObject);
+      } catch (err) {
+        console.error('Error reading or parsing file:', err);
+      }
+    }
+    return resultObject;
+  });
+
+
+
+
+
+
+
 
 });
 

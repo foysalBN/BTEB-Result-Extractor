@@ -1,4 +1,4 @@
-{
+let json = {
   "data": [
     {
       "collegeName": "74009 - Cox's Bazar Polytechnic Institute",
@@ -361,3 +361,18 @@
     "savedOn": "6/21/2024"
   }
 }
+let csvData = ''
+
+const { data } = json
+data.forEach(college => {
+  const { collegeName, passResult, referredResult } = college
+  csvData += collegeName + '\nRoll,Result\n'
+  for (let roll in passResult) {
+    csvData += `${roll},${passResult[roll]}\n`
+  }
+  for (let roll in referredResult) {
+    csvData += `${roll},"${referredResult[roll]}"\n`
+  }
+
+})
+console.log(csvData)
