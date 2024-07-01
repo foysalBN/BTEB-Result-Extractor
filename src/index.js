@@ -1,7 +1,7 @@
-const { app, BrowserWindow, ipcMain, dialog, Notification } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, Notification, shell } = require('electron');
 const path = require('node:path');
-// const fs = require('fs')
-const fs = require('fs').promises;
+const fs = require('fs')
+const fsPromise = require('fs').promises;
 const { extract } = require('./util/resultExtractor')
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -54,7 +54,6 @@ app.whenReady().then(() => {
 
     if (!canceled) {
       let pdfPath = filePaths[0]
-      console.log(pdfPath)
       const startNotification = new Notification({ title: "Extraction Started", body: `Extracting Result from ${pdfPath}` })
       startNotification.show()
       setTimeout(() => startNotification.close(), 1500)
@@ -62,8 +61,6 @@ app.whenReady().then(() => {
     }
 
   })
-
-
 
   ipcMain.handle('dialog:importJson', async (event, data) => {
     let { canceled, filePaths } = await dialog.showOpenDialog({
@@ -74,9 +71,8 @@ app.whenReady().then(() => {
     let resultObject = {};
     if (!canceled && filePaths.length === 1) {
       try {
-        const fileData = await fs.readFile(filePaths[0], 'utf-8');
+        const fileData = await fsPromise.readFile(filePaths[0], 'utf-8');
         resultObject = JSON.parse(fileData);
-        console.log(resultObject);
       } catch (err) {
         console.error('Error reading or parsing file:', err);
       }
@@ -84,12 +80,26 @@ app.whenReady().then(() => {
     return resultObject;
   });
 
+  ipcMain.handle('dialog:save-csv', async (e, csv) => {
+    let { canceled, filePath } = await dialog.showSaveDialog({
+      title: 'Save Referred CSV/EXCEL file',
+      filters: [{ name: "csv", extensions: ["csv"] }],
+    })
+    if (!canceled) {
+      fs.writeFile(filePath, csv, () => {
+        const doneNotification = new Notification({ title: "SVC file saved", body: `Referred sub saved in svc file.` })
+        doneNotification.show()
+        shell.showItemInFolder(filePath)
+      });
+
+    }
 
 
+  })
 
-
-
-
+  ipcMain.handle('link:open', async (e, link) => {
+    shell.openExternal(link)
+  })
 
 });
 

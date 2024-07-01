@@ -13,14 +13,35 @@ body {
   position: relative;
 }
 
+.meta {
+  margin-top: .5em;
+  margin-bottom: -15px;
+}
+
+.search button {
+  margin-top: 4px;
+}
+
+
+.link {
+  cursor: pointer;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
 #ilovepdf {
   color: #e5322d;
 }
-
 
 
 footer {
   position: absolute;
   bottom: 2em;
   left: 2rem;
+}
+
+#github-link {
+  color: #1b75d0;
 }

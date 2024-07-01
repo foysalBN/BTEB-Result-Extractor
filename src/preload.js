@@ -79,10 +79,35 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     let resultHTML = ''
     for (let collegeName in result) {
-      resultHTML += `<b>${collegeName} (${result[collegeName].length})</b> : ${result[collegeName].join(', ')}<br>`
+      resultHTML += `<b>${collegeName} (${result[collegeName].length})</b> :<br> ${result[collegeName].join(', ')}<br>`
     }
     document.querySelector('.result').innerHTML = resultHTML
   }
   document.querySelector('#subject-search').addEventListener('click', handleSubjectSearch)
+
+  const handleSaveReferredCsv = () => {
+    let csvData = 'SubjectCode,CollegeName,Roll\n'
+    for (let subjectCode in referredSubs) {
+      let isFirst = true
+      let collegeRes = referredSubs[subjectCode]
+      for (let collegeName in collegeRes) {
+        csvData += `${isFirst ? subjectCode : ''},${collegeName},"${collegeRes[collegeName].join(', ')}" \n`
+        isFirst = false
+      }
+    }
+    ipcRenderer.invoke('dialog:save-csv', csvData)
+  }
+  document.querySelector('#save-referred-csv').addEventListener('click', handleSaveReferredCsv)
+
+
+
+  // minor functionalities
+  document.querySelector('#ilovepdf').addEventListener('click', () => {
+    ipcRenderer.invoke('link:open', 'https://www.ilovepdf.com/split_pdf')
+  })
+  document.querySelector('#github-link').addEventListener('click', () => {
+    ipcRenderer.invoke('link:open', 'http://www.github.com/foysalbn')
+  })
+
 
 })

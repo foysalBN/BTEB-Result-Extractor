@@ -10,13 +10,14 @@
 
 <body>
   <h1 class="title is-2">BTEB Result Extractor</h1>
-  <h6 class="subtitle is-6">A Custom tool to Extract Result from PDF.</h6>
+  <h6 class="subtitle is-6">A Custom tool to Result from PDF.</h6>
 
   <div>
     <button class="button is-small" id='extract'>Extract From PDF</button>
     or
     <button class="button is-small" id='import'>Import From JSON</button>
-    <p><i>Note: Please split the pdf before extract. Use <span id="ilovepdf">www.ilovepdf.com/split_pdf</span></i></p>
+    <p style="font-size: .9em; opacity: .9;"><i>Note: Please split the pdf before extract. Use <span class="link"
+          id="ilovepdf">www.ilovepdf.com/split_pdf</span></i></p>
     <div class="meta"></div>
     <hr>
   </div>
@@ -26,6 +27,7 @@
     <br> or
     <input class="input is-primary is-small" id="sub-code" type="number" placeholder="Enter referred Subject Code" />
     <button class="button is-small" id='subject-search'>Search by Referred Sub</button>
+    <button class="button is-small" id='save-referred-csv'>Save All as CSV</button>
     <br><br>
     <div class="result"> </div>
   </div>
@@ -33,8 +35,9 @@
 
 
 
-  <footer>Developed with <span>💖</span> by <a href="http://www.github.com/foysalbn" target="_blank"
-      rel="noopener noreferrer">FoysalBN</a></footer>
+  <footer>Developed with <span>💖</span> by <span class="link" id="github-link" target="_blank"
+      rel="noopener noreferrer">FoysalBN</>
+  </footer>
   <script src="./renderer.js"></script>
 </body>
 
